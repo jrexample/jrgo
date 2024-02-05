@@ -2,7 +2,6 @@ package services
 
 import (
 	"github.com/jackyrusly/jrgo/repositories"
-	"github.com/jackyrusly/jrgo/utils"
 )
 
 type IProfileService interface {
@@ -11,13 +10,11 @@ type IProfileService interface {
 
 type ProfileService struct {
 	ur repositories.IUserRepository
-	c  *utils.Config
 }
 
-func NewProfileService(ur repositories.IUserRepository, c *utils.Config) *ProfileService {
+func NewProfileService(ur repositories.IUserRepository) *ProfileService {
 	return &ProfileService{
 		ur: ur,
-		c:  c,
 	}
 }
 

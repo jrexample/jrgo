@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackyrusly/jrgo/config"
 	"github.com/jackyrusly/jrgo/dto"
 	"github.com/jackyrusly/jrgo/repositories"
-	"github.com/jackyrusly/jrgo/utils"
 )
 
 type IAuthService interface {
@@ -19,13 +19,11 @@ type IAuthService interface {
 
 type AuthService struct {
 	ur repositories.IUserRepository
-	c  *utils.Config
 }
 
-func NewAuthService(ur repositories.IUserRepository, c *utils.Config) *AuthService {
+func NewAuthService(ur repositories.IUserRepository) *AuthService {
 	return &AuthService{
 		ur: ur,
-		c:  c,
 	}
 }
 
@@ -34,10 +32,10 @@ func (as *AuthService) ServiceGenerateToken(i int64) (*dto.TokenBody, error) {
 		jwt.MapClaims{
 			"iss": "jrgo-server",
 			"id":  i,
-			"exp": time.Now().Add(time.Hour * time.Duration(as.c.AccessTokenExpiration)).Unix(),
+			"exp": time.Now().Add(time.Hour * time.Duration(config.Config.AccessTokenExpiration)).Unix(),
 		})
 
-	accessToken, err := at.SignedString(as.c.AccessTokenSecret)
+	accessToken, err := at.SignedString(config.Config.AccessTokenSecret)
 
 	if err != nil {
 		return nil, err
@@ -47,10 +45,10 @@ func (as *AuthService) ServiceGenerateToken(i int64) (*dto.TokenBody, error) {
 		jwt.MapClaims{
 			"iss": "jrgo-server",
 			"at":  accessToken,
-			"exp": time.Now().Add(time.Hour * time.Duration(as.c.RefreshTokenExpiration)),
+			"exp": time.Now().Add(time.Hour * time.Duration(config.Config.RefreshTokenExpiration)),
 		})
 
-	refreshToken, err := rt.SignedString(as.c.RefreshTokenSecret)
+	refreshToken, err := rt.SignedString(config.Config.RefreshTokenSecret)
 
 	if err != nil {
 		return nil, err
@@ -79,7 +77,7 @@ func (as *AuthService) ServiceLogin(d dto.LoginRequestBody) (*dto.TokenBody, err
 func (as *AuthService) ServiceRefreshToken(d dto.TokenBody) (*dto.TokenBody, error) {
 	refreshTokenClaims := dto.RefreshTokenClaims{}
 	refreshToken, err := jwt.ParseWithClaims(d.RefreshToken, &refreshTokenClaims, func(token *jwt.Token) (interface{}, error) {
-		return as.c.RefreshTokenSecret, nil
+		return config.Config.RefreshTokenSecret, nil
 	})
 
 	if err != nil {

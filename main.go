@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jackyrusly/jrgo/config"
 	"github.com/jackyrusly/jrgo/controllers"
 	"github.com/jackyrusly/jrgo/middlewares"
 	"github.com/jackyrusly/jrgo/repositories"
@@ -12,12 +13,13 @@ import (
 )
 
 func main() {
+	config.LoadConfig()
+
 	fx.New(
 		/* Utils */
 		fx.Provide(
 			utils.NewDatabase,
 			utils.NewRouter,
-			utils.NewConfig,
 		),
 		/* Routes */
 		fx.Provide(

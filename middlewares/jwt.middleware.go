@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackyrusly/jrgo/config"
 	"github.com/jackyrusly/jrgo/dto"
 	"github.com/jackyrusly/jrgo/repositories"
 	"github.com/jackyrusly/jrgo/utils"
@@ -12,13 +13,11 @@ import (
 )
 
 type JwtMiddleware struct {
-	c  *utils.Config
 	ur repositories.IUserRepository
 }
 
-func NewJwtMiddleware(c *utils.Config, ur repositories.IUserRepository) *JwtMiddleware {
+func NewJwtMiddleware(ur repositories.IUserRepository) *JwtMiddleware {
 	return &JwtMiddleware{
-		c:  c,
 		ur: ur,
 	}
 }
@@ -45,7 +44,7 @@ func (j *JwtMiddleware) CheckAccessToken(next echo.HandlerFunc) echo.HandlerFunc
 
 		claims := dto.AccessTokenClaims{}
 		token, err := jwt.ParseWithClaims(accessToken, &claims, func(token *jwt.Token) (interface{}, error) {
-			return j.c.AccessTokenSecret, nil
+			return config.Config.AccessTokenSecret, nil
 		})
 
 		if err != nil {

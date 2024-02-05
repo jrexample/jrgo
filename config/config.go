@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"os"
@@ -7,14 +7,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
+type AppConfig struct {
 	AccessTokenSecret      []byte
 	RefreshTokenSecret     []byte
 	AccessTokenExpiration  int
 	RefreshTokenExpiration int
 }
 
-func NewConfig() *Config {
+var Config *AppConfig
+
+func LoadConfig() {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -33,12 +35,10 @@ func NewConfig() *Config {
 		panic(err)
 	}
 
-	config := &Config{
+	Config = &AppConfig{
 		AccessTokenSecret:      []byte(os.Getenv("ACCESS_TOKEN_SECRET")),
 		RefreshTokenSecret:     []byte(os.Getenv("REFRESH_TOKEN_SECRET")),
 		AccessTokenExpiration:  accessTokenExpiration,
 		RefreshTokenExpiration: refreshTokenExpiration,
 	}
-
-	return config
 }
