@@ -13,32 +13,48 @@ import (
 
 func main() {
 	fx.New(
+		/* Utils */
 		fx.Provide(
 			utils.NewDatabase,
 			utils.NewRouter,
 			utils.NewConfig,
+		),
+		/* Routes */
+		fx.Provide(
 			routes.NewAuthRoute,
 			routes.NewProfileRoute,
+		),
+		/* Middlewares */
+		fx.Provide(
 			middlewares.NewJwtMiddleware,
+		),
+		/* Controllers */
+		fx.Provide(
 			fx.Annotate(
 				controllers.NewAuthController,
 				fx.As(new(controllers.IAuthController)),
 			),
 			fx.Annotate(
+				controllers.NewProfileController,
+				fx.As(new(controllers.IProfileController)),
+			),
+		),
+		/* Services */
+		fx.Provide(
+			fx.Annotate(
 				services.NewAuthService,
 				fx.As(new(services.IAuthService)),
 			),
 			fx.Annotate(
-				repositories.NewUserRepository,
-				fx.As(new(repositories.IUserRepository)),
-			),
-			fx.Annotate(
-				controllers.NewProfileController,
-				fx.As(new(controllers.IProfileController)),
-			),
-			fx.Annotate(
 				services.NewProfileService,
 				fx.As(new(services.IProfileService)),
+			),
+		),
+		/* Repositories */
+		fx.Provide(
+			fx.Annotate(
+				repositories.NewUserRepository,
+				fx.As(new(repositories.IUserRepository)),
 			),
 		),
 		fx.Invoke(func(e *echo.Echo, ar *routes.AuthRoute, pr *routes.ProfileRoute) {
