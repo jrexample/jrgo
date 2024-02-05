@@ -33,7 +33,7 @@ func (ac *AuthController) ControllerRegister(c echo.Context) error {
 	}
 
 	if err := c.Validate(d); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if err := ac.as.ServiceRegister(*d); err != nil {
